@@ -1,0 +1,19 @@
+version: "3.8"
+services:
+
+  netbox-openstack-agent:
+    image: saashup/netbox-openstack-agent:latest
+    command: npm start
+    volumes:
+      - type: volume
+        source: netbox-openstack-agent
+        target: /data
+    restart: unless-stopped
+    ports:
+      - "1880:1880"
+    environment:
+      - NODE_ENV=prod
+      - PORT=1880
+      
+volumes:
+  netbox-openstack-agent:

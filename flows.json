@@ -1,0 +1,782 @@
+[
+    {
+        "id": "f498656cd7178fd2",
+        "type": "tab",
+        "label": "OPENSTACK",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "5ee790a54e474069",
+        "type": "inject",
+        "z": "f498656cd7178fd2",
+        "name": "OPENSTACK",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{}",
+        "payloadType": "json",
+        "x": 220,
+        "y": 100,
+        "wires": [
+            [
+                "6fbfcfb96bc6407e"
+            ]
+        ]
+    },
+    {
+        "id": "51358a8b794ded2f",
+        "type": "change",
+        "z": "f498656cd7178fd2",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "config",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 820,
+        "y": 100,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "5ef6b39f43568a96",
+        "type": "inject",
+        "z": "f498656cd7178fd2",
+        "name": "FETCH OPENSTACK",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 180,
+        "y": 260,
+        "wires": [
+            [
+                "3c950888b37ce755"
+            ]
+        ]
+    },
+    {
+        "id": "3c950888b37ce755",
+        "type": "change",
+        "z": "f498656cd7178fd2",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "template",
+                "pt": "msg",
+                "to": "OVHtemplate",
+                "tot": "global"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\t   \"auth\": {\t       \"identity\": {\t           \"methods\": [ \"password\" ],\t           \"password\": {\t               \"user\": {\t                   \"name\": msg.template.project.user,\t                   \"domain\": {\t                       \"id\": \"default\"                    \t                   },\t                   \"password\": msg.template.project.password               \t               }            \t           }        \t       },\t       \"scope\": {\t           \"project\": {\t               \"name\": msg.template.project.name,\t               \"domain\": {\t                   \"id\": \"default\"                \t               }            \t           }        \t       }    \t   }\t}",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "url",
+                "pt": "msg",
+                "to": "https://auth.cloud.ovh.net/v3/auth/tokens?nocatalog",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "method",
+                "pt": "msg",
+                "to": "POST",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "endpoints",
+                "pt": "global",
+                "to": "{}",
+                "tot": "json"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 420,
+        "y": 260,
+        "wires": [
+            [
+                "190c6251c039ac64"
+            ]
+        ]
+    },
+    {
+        "id": "190c6251c039ac64",
+        "type": "http request",
+        "z": "f498656cd7178fd2",
+        "name": "Auth OPENSTACK",
+        "method": "use",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 650,
+        "y": 260,
+        "wires": [
+            [
+                "c1e5d655037acf4d"
+            ]
+        ]
+    },
+    {
+        "id": "c1e5d655037acf4d",
+        "type": "switch",
+        "z": "f498656cd7178fd2",
+        "name": "",
+        "property": "statusCode",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "gt",
+                "v": "300",
+                "vt": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 850,
+        "y": 260,
+        "wires": [
+            [],
+            [
+                "56857c3caddc1fa9"
+            ]
+        ]
+    },
+    {
+        "id": "80592048ffd3864f",
+        "type": "http in",
+        "z": "f498656cd7178fd2",
+        "name": "",
+        "url": "/api/openstack",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 250,
+        "y": 320,
+        "wires": [
+            [
+                "3c950888b37ce755"
+            ]
+        ]
+    },
+    {
+        "id": "56857c3caddc1fa9",
+        "type": "change",
+        "z": "f498656cd7178fd2",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "bearer",
+                "pt": "msg",
+                "to": "headers[\"x-subject-token\"]",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "headers",
+                "pt": "msg",
+                "to": "{}",
+                "tot": "json"
+            },
+            {
+                "t": "set",
+                "p": "headers[\"X-Auth-Token\"]",
+                "pt": "msg",
+                "to": "bearer",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "name",
+                "pt": "msg",
+                "to": "template.regions[msg.region].name",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "name",
+                "pt": "msg",
+                "to": "waw1",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "url",
+                "pt": "msg",
+                "to": "\"https://compute.\" & msg.name & \".cloud.ovh.net/v2.1/\" & msg.template.project.id & \"/servers/detail\"",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "method",
+                "pt": "msg",
+                "to": "GET",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "requestTimeout",
+                "pt": "msg",
+                "to": "15000",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 500,
+        "y": 320,
+        "wires": [
+            [
+                "be0e967d1f6999be"
+            ]
+        ]
+    },
+    {
+        "id": "be0e967d1f6999be",
+        "type": "http request",
+        "z": "f498656cd7178fd2",
+        "name": "Fetch OPENSTACK",
+        "method": "use",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 740,
+        "y": 320,
+        "wires": [
+            [
+                "17ff082a2c298ee2"
+            ]
+        ]
+    },
+    {
+        "id": "17ff082a2c298ee2",
+        "type": "debug",
+        "z": "f498656cd7178fd2",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 980,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "d729637f8556865b",
+        "type": "http in",
+        "z": "f498656cd7178fd2",
+        "name": "",
+        "url": "/api/openstack",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 230,
+        "y": 500,
+        "wires": [
+            [
+                "99d81f056fbc2bbb"
+            ]
+        ]
+    },
+    {
+        "id": "99d81f056fbc2bbb",
+        "type": "change",
+        "z": "f498656cd7178fd2",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "template",
+                "pt": "msg",
+                "to": "OVHtemplate",
+                "tot": "global"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\t   \"auth\": {\t       \"identity\": {\t           \"methods\": [ \"password\" ],\t           \"password\": {\t               \"user\": {\t                   \"name\": msg.template.project.user,\t                   \"domain\": {\t                       \"id\": \"default\"                    \t                   },\t                   \"password\": msg.template.project.password               \t               }            \t           }        \t       },\t       \"scope\": {\t           \"project\": {\t               \"name\": msg.template.project.name,\t               \"domain\": {\t                   \"id\": \"default\"                \t               }            \t           }        \t       }    \t   }\t}",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "url",
+                "pt": "msg",
+                "to": "https://auth.cloud.ovh.net/v3/auth/tokens?nocatalog",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "method",
+                "pt": "msg",
+                "to": "POST",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "endpoints",
+                "pt": "global",
+                "to": "{}",
+                "tot": "json"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 400,
+        "y": 440,
+        "wires": [
+            [
+                "67482953a0356ddb"
+            ]
+        ]
+    },
+    {
+        "id": "67482953a0356ddb",
+        "type": "http request",
+        "z": "f498656cd7178fd2",
+        "name": "Auth OPENSTACK",
+        "method": "use",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 630,
+        "y": 440,
+        "wires": [
+            [
+                "5f209308d0646674"
+            ]
+        ]
+    },
+    {
+        "id": "5f209308d0646674",
+        "type": "switch",
+        "z": "f498656cd7178fd2",
+        "name": "",
+        "property": "statusCode",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "gt",
+                "v": "300",
+                "vt": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 830,
+        "y": 440,
+        "wires": [
+            [],
+            [
+                "0a7ecaa8978da35b"
+            ]
+        ]
+    },
+    {
+        "id": "0a7ecaa8978da35b",
+        "type": "change",
+        "z": "f498656cd7178fd2",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "bearer",
+                "pt": "msg",
+                "to": "headers[\"x-subject-token\"]",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "headers",
+                "pt": "msg",
+                "to": "{}",
+                "tot": "json"
+            },
+            {
+                "t": "set",
+                "p": "headers[\"X-Auth-Token\"]",
+                "pt": "msg",
+                "to": "bearer",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "name",
+                "pt": "msg",
+                "to": "template.regions[msg.region].name",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "name",
+                "pt": "msg",
+                "to": "waw1",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "url",
+                "pt": "msg",
+                "to": "\"https://compute.\" & msg.name & \".cloud.ovh.net/v2.1/\" & msg.template.project.id & \"/servers\"",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "method",
+                "pt": "msg",
+                "to": "POST",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "requestTimeout",
+                "pt": "msg",
+                "to": "15000",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"server\":{\"flavorRef\":\"774a7187-eeb2-4639-92e7-546351cb3eca\",\"name\":\"toto\",\"imageRef\":\"c38de47a-6ec5-496c-bc87-2a1d74f9244e\",\"networks\":[{\"uuid\":\"6c928965-47ea-463f-acc8-6d4a152e9745\"}]}}",
+                "tot": "json"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 480,
+        "y": 500,
+        "wires": [
+            [
+                "5f7cbea36dfcaf8b"
+            ]
+        ]
+    },
+    {
+        "id": "5f7cbea36dfcaf8b",
+        "type": "http request",
+        "z": "f498656cd7178fd2",
+        "name": "Create OPENSTACK",
+        "method": "use",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 700,
+        "y": 500,
+        "wires": [
+            [
+                "2127419990e17fe6"
+            ]
+        ]
+    },
+    {
+        "id": "2127419990e17fe6",
+        "type": "debug",
+        "z": "f498656cd7178fd2",
+        "name": "debug 3",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 980,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "c207d17f55308382",
+        "type": "inject",
+        "z": "f498656cd7178fd2",
+        "name": "CREATE OPENSTACK",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 160,
+        "y": 440,
+        "wires": [
+            [
+                "99d81f056fbc2bbb"
+            ]
+        ]
+    },
+    {
+        "id": "6fbfcfb96bc6407e",
+        "type": "file in",
+        "z": "f498656cd7178fd2",
+        "name": "",
+        "filename": "/data/config.js",
+        "filenameType": "str",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 460,
+        "y": 100,
+        "wires": [
+            [
+                "0f62ffb5206976e5"
+            ]
+        ]
+    },
+    {
+        "id": "0f62ffb5206976e5",
+        "type": "json",
+        "z": "f498656cd7178fd2",
+        "name": "",
+        "property": "payload",
+        "action": "obj",
+        "pretty": false,
+        "x": 630,
+        "y": 100,
+        "wires": [
+            [
+                "51358a8b794ded2f"
+            ]
+        ]
+    },
+    {
+        "id": "039fb830c0543e5e",
+        "type": "http in",
+        "z": "f498656cd7178fd2",
+        "name": "",
+        "url": "/",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 190,
+        "y": 600,
+        "wires": [
+            [
+                "5e3c2e763e35f3be"
+            ]
+        ]
+    },
+    {
+        "id": "5e3c2e763e35f3be",
+        "type": "file in",
+        "z": "f498656cd7178fd2",
+        "name": "",
+        "filename": "./index.html",
+        "filenameType": "str",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 370,
+        "y": 600,
+        "wires": [
+            [
+                "735b094d24d8b547"
+            ]
+        ]
+    },
+    {
+        "id": "735b094d24d8b547",
+        "type": "http response",
+        "z": "f498656cd7178fd2",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 680,
+        "y": 640,
+        "wires": []
+    },
+    {
+        "id": "00ef3d3dbfd5d7f6",
+        "type": "http in",
+        "z": "f498656cd7178fd2",
+        "name": "",
+        "url": "/api/config",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 220,
+        "y": 660,
+        "wires": [
+            [
+                "79ed381c0f485c18"
+            ]
+        ]
+    },
+    {
+        "id": "79ed381c0f485c18",
+        "type": "change",
+        "z": "f498656cd7178fd2",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "config",
+                "tot": "global"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 420,
+        "y": 660,
+        "wires": [
+            [
+                "735b094d24d8b547"
+            ]
+        ]
+    },
+    {
+        "id": "9271d8ab8439524d",
+        "type": "http in",
+        "z": "f498656cd7178fd2",
+        "name": "",
+        "url": "/api/config",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 220,
+        "y": 720,
+        "wires": [
+            [
+                "6580ca924f7e0ce9"
+            ]
+        ]
+    },
+    {
+        "id": "cad893a53d41e0aa",
+        "type": "http response",
+        "z": "f498656cd7178fd2",
+        "name": "",
+        "statusCode": "201",
+        "headers": {},
+        "x": 640,
+        "y": 720,
+        "wires": []
+    },
+    {
+        "id": "6580ca924f7e0ce9",
+        "type": "change",
+        "z": "f498656cd7178fd2",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "config",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 440,
+        "y": 720,
+        "wires": [
+            [
+                "cad893a53d41e0aa"
+            ]
+        ]
+    }
+]
