@@ -1,12 +1,12 @@
 version: "3.8"
 services:
 
-  netbox-openstack-agent:
-    image: saashup/netbox-openstack-agent:latest
+  netbox-vm-agent:
+    image: saashup/netbox-vm-agent:latest
     command: npm start
     volumes:
       - type: volume
-        source: netbox-openstack-agent
+        source: netbox-vm-agent
         target: /data
     restart: unless-stopped
     ports:
@@ -16,4 +16,4 @@ services:
       - PORT=1880
       
 volumes:
-  netbox-openstack-agent:
+  netbox-vm-agent:

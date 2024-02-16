@@ -1,19 +1,19 @@
 {
-  "name": "netbox-openstack-agent",
+  "name": "netbox-vm-agent",
   "version": "0.0.1",
-  "description": "Saashup openstack agent for netbox manager",
+  "description": "Saashup vm agent for netbox manager",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js"
   },
   "keywords": [
-    "saashup nodered openstack netbox"
+    "saashup nodered vm netbox"
   ],
   "author": "lav@saashup.com",
-  "homepage": "https://github.com/SaaShup/netbox-openstack-agent",
+  "homepage": "https://github.com/SaaShup/netbox-vm-agent",
   "bugs": {
-    "url": "https://github.com/SaaShup/netbox-openstack-agent/issues",
+    "url": "https://github.com/SaaShup/netbox-vm-agent/issues",
     "email": "contact@saashup.com"
   },
   "license": "ISC",

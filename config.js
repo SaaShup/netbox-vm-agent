@@ -3,7 +3,7 @@
 	"netbox_token": "thisisthedefaultoken",
 	"ui": 1,
 	"id": "",
-	"openstack": {
+	"ovh": {
 			"project": {
 				"name": "myProject",
 				"id": "myId",
