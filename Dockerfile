@@ -15,3 +15,8 @@ ENV FLOWS=/usr/src/node-red/flows.json
 
 COPY --chown=node-red:node-red settings.js /data/settings.js
 COPY --chown=node-red:node-red config.js /data/config.js
+
+RUN curl --proto '=https' --tlsv1.2 -fsSL https://get.opentofu.org/install-opentofu.sh -o install-opentofu.sh
+RUN chmod +x install-opentofu.sh
+RUN ./install-opentofu.sh --install-method standalone --skip-verify --install-path /usr/src/node-red --symlink-path -
+RUN rm install-opentofu.sh
