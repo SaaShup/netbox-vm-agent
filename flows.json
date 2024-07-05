@@ -581,7 +581,7 @@
                 "t": "set",
                 "p": "payload",
                 "pt": "msg",
-                "to": "{\t   \"server\":{\t       \"flavorRef\": msg.createvm.flavor,\t       \"name\": msg.createvm.name,\t       \"imageRef\": msg.createvm.image,\t       \"networks\":[\t           {\t               \"uuid\": msg.createvm.network\t           }\t       ]\t   }\t}",
+                "to": "{\t   \"server\":{\t       \"flavorRef\": msg.createvm.flavor,\t       \"name\": msg.createvm.name,\t       \"imageRef\": msg.createvm.image,\t       \"networks\":[\t           {\t               \"uuid\": msg.createvm.network\t           }\t       ],\t       \"key_name\": msg.createvm.keyPair,\t       \"user_data\": msg.createvm.userData\t   }\t}",
                 "tot": "jsonata"
             }
         ],
@@ -618,7 +618,8 @@
         "y": 260,
         "wires": [
             [
-                "cac3c2207ec1f1d9"
+                "cac3c2207ec1f1d9",
+                "bdc41e0727eed85d"
             ]
         ]
     },
@@ -690,5 +691,303 @@
         "x": 970,
         "y": 180,
         "wires": []
+    },
+    {
+        "id": "d2fe6bfa6a8cae77",
+        "type": "link in",
+        "z": "f498656cd7178fd2",
+        "name": "Check Update server status",
+        "links": [
+            "bdc41e0727eed85d"
+        ],
+        "x": 55,
+        "y": 520,
+        "wires": [
+            [
+                "25ebb1629c93662b"
+            ]
+        ]
+    },
+    {
+        "id": "bdc41e0727eed85d",
+        "type": "link out",
+        "z": "f498656cd7178fd2",
+        "name": "link out 1",
+        "mode": "link",
+        "links": [
+            "d2fe6bfa6a8cae77"
+        ],
+        "x": 1105,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "25ebb1629c93662b",
+        "type": "change",
+        "z": "f498656cd7178fd2",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "serverstatus",
+                "pt": "msg",
+                "to": "uknown",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 200,
+        "y": 520,
+        "wires": [
+            [
+                "1b7de3c494c34f41"
+            ]
+        ]
+    },
+    {
+        "id": "8e52092d7337f432",
+        "type": "switch",
+        "z": "f498656cd7178fd2",
+        "name": "",
+        "property": "serverstatus",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "ACTIVE",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 550,
+        "y": 520,
+        "wires": [
+            [
+                "5b0c2bff5d2799e6"
+            ],
+            [
+                "ccbb7bd32d250d8e"
+            ]
+        ]
+    },
+    {
+        "id": "5b0c2bff5d2799e6",
+        "type": "debug",
+        "z": "f498656cd7178fd2",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1040,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "e058ee70a796e859",
+        "type": "subflow:269f4dbfe5402677",
+        "z": "f498656cd7178fd2",
+        "name": "",
+        "x": 400,
+        "y": 640,
+        "wires": [
+            [
+                "ad1fff9801d08484"
+            ]
+        ]
+    },
+    {
+        "id": "ad1fff9801d08484",
+        "type": "change",
+        "z": "f498656cd7178fd2",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "bearer",
+                "pt": "msg",
+                "to": "headers[\"x-subject-token\"]",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "headers",
+                "pt": "msg",
+                "to": "{}",
+                "tot": "json"
+            },
+            {
+                "t": "set",
+                "p": "headers[\"X-Auth-Token\"]",
+                "pt": "msg",
+                "to": "bearer",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "requestTimeout",
+                "pt": "msg",
+                "to": "15000",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "method",
+                "pt": "msg",
+                "to": "GET",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "url",
+                "pt": "msg",
+                "to": "\"https://compute.\" & msg.createvm.region & \".\" & msg.createvm.provider.url & \"/v2.1/\" & msg.createvm.provider.projectId & \"/servers/\" & msg.serverId",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 580,
+        "y": 640,
+        "wires": [
+            [
+                "1825c2e333ffa921"
+            ]
+        ]
+    },
+    {
+        "id": "9b335838e4bbae58",
+        "type": "change",
+        "z": "f498656cd7178fd2",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "serverstatus",
+                "pt": "msg",
+                "to": "payload.server.status",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1200,
+        "y": 640,
+        "wires": [
+            [
+                "8e52092d7337f432"
+            ]
+        ]
+    },
+    {
+        "id": "ccbb7bd32d250d8e",
+        "type": "delay",
+        "z": "f498656cd7178fd2",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "90",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 220,
+        "y": 640,
+        "wires": [
+            [
+                "e058ee70a796e859"
+            ]
+        ]
+    },
+    {
+        "id": "1825c2e333ffa921",
+        "type": "http request",
+        "z": "f498656cd7178fd2",
+        "name": "Get openstack status",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 800,
+        "y": 640,
+        "wires": [
+            [
+                "6684af60556eba6d"
+            ]
+        ]
+    },
+    {
+        "id": "1b7de3c494c34f41",
+        "type": "change",
+        "z": "f498656cd7178fd2",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "serverId",
+                "pt": "msg",
+                "to": "payload.server.id",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 400,
+        "y": 520,
+        "wires": [
+            [
+                "8e52092d7337f432"
+            ]
+        ]
+    },
+    {
+        "id": "6684af60556eba6d",
+        "type": "json",
+        "z": "f498656cd7178fd2",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 990,
+        "y": 640,
+        "wires": [
+            [
+                "9b335838e4bbae58"
+            ]
+        ]
     }
 ]

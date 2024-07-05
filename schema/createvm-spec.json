@@ -42,6 +42,12 @@
         },
         "network": {
             "type": "string"
+        },
+        "keyPair": {
+            "type": "string"
+        },
+        "userData": {
+            "type": "string"
         }
     },
     "required": [
@@ -49,7 +55,8 @@
         "flavor",
         "name",
         "image",
-        "network"
+        "network",
+        "keyPair"
     ]
 }
 
