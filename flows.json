@@ -16,6 +16,14 @@
         "env": []
     },
     {
+        "id": "0f9d09fb97baf1f4",
+        "type": "tab",
+        "label": "NETBOX",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
         "id": "269f4dbfe5402677",
         "type": "subflow",
         "name": "Openstack Auth",
@@ -772,29 +780,12 @@
         "y": 520,
         "wires": [
             [
-                "5b0c2bff5d2799e6"
+                "e4159275aef7dd1b"
             ],
             [
                 "ccbb7bd32d250d8e"
             ]
         ]
-    },
-    {
-        "id": "5b0c2bff5d2799e6",
-        "type": "debug",
-        "z": "f498656cd7178fd2",
-        "name": "debug 1",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 1040,
-        "y": 500,
-        "wires": []
     },
     {
         "id": "e058ee70a796e859",
@@ -988,6 +979,378 @@
             [
                 "9b335838e4bbae58"
             ]
+        ]
+    },
+    {
+        "id": "e4159275aef7dd1b",
+        "type": "link out",
+        "z": "f498656cd7178fd2",
+        "name": "link out 2",
+        "mode": "link",
+        "links": [
+            "2e3451e108a30101"
+        ],
+        "x": 865,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "2e3451e108a30101",
+        "type": "link in",
+        "z": "0f9d09fb97baf1f4",
+        "name": "Netbox Vm Update",
+        "links": [
+            "d5a303be485f823f",
+            "e4159275aef7dd1b"
+        ],
+        "x": 245,
+        "y": 240,
+        "wires": [
+            [
+                "1b9a3a26756111fd"
+            ]
+        ]
+    },
+    {
+        "id": "1b9a3a26756111fd",
+        "type": "change",
+        "z": "0f9d09fb97baf1f4",
+        "name": "Set VM Data to fetch",
+        "rules": [
+            {
+                "t": "set",
+                "p": "headers",
+                "pt": "msg",
+                "to": "{}",
+                "tot": "json"
+            },
+            {
+                "t": "set",
+                "p": "url",
+                "pt": "msg",
+                "to": "$env('NETBOX_URL') & \"/api/virtualization/virtual-machines/?name=\" & msg.createvm.name",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "headers.Authorization",
+                "pt": "msg",
+                "to": "\"Token \" & $env('NETBOX_TOKEN')",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "headers.content-type",
+                "pt": "msg",
+                "to": "application/json",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "vmipaddress",
+                "pt": "msg",
+                "to": "payload.server.addresses.Ext-Net.0.addr",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 420,
+        "y": 240,
+        "wires": [
+            [
+                "2d54e993660590aa"
+            ]
+        ]
+    },
+    {
+        "id": "2d54e993660590aa",
+        "type": "http request",
+        "z": "0f9d09fb97baf1f4",
+        "name": "Fetch VM ID",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 650,
+        "y": 240,
+        "wires": [
+            [
+                "a3d6201e4731b9c2"
+            ]
+        ]
+    },
+    {
+        "id": "a3d6201e4731b9c2",
+        "type": "change",
+        "z": "0f9d09fb97baf1f4",
+        "name": "Create VM interface",
+        "rules": [
+            {
+                "t": "set",
+                "p": "vmid",
+                "pt": "msg",
+                "to": "payload.results[0].id",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "headers",
+                "pt": "msg",
+                "to": "{}",
+                "tot": "json"
+            },
+            {
+                "t": "set",
+                "p": "headers.Authorization",
+                "pt": "msg",
+                "to": "\"Token \" & $env('NETBOX_TOKEN')",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "url",
+                "pt": "msg",
+                "to": "$env('NETBOX_URL') & \"/api/virtualization/interfaces/\"",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\t    \"name\": \"eth0\",\t    \"virtual_machine\": {\t        \"name\": msg.createvm.name\t    }\t\t}",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "method",
+                "pt": "msg",
+                "to": "POST",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "headers.content-type",
+                "pt": "msg",
+                "to": "application/json",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 940,
+        "y": 240,
+        "wires": [
+            [
+                "4ab758accbb6cbc1"
+            ]
+        ]
+    },
+    {
+        "id": "4ab758accbb6cbc1",
+        "type": "http request",
+        "z": "0f9d09fb97baf1f4",
+        "name": "",
+        "method": "use",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1190,
+        "y": 240,
+        "wires": [
+            [
+                "f105cc2b838df549"
+            ]
+        ]
+    },
+    {
+        "id": "f105cc2b838df549",
+        "type": "change",
+        "z": "0f9d09fb97baf1f4",
+        "name": "Create IP Address",
+        "rules": [
+            {
+                "t": "set",
+                "p": "headers",
+                "pt": "msg",
+                "to": "{}",
+                "tot": "json"
+            },
+            {
+                "t": "set",
+                "p": "headers.Authorization",
+                "pt": "msg",
+                "to": "\"Token \" & $env('NETBOX_TOKEN')",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "url",
+                "pt": "msg",
+                "to": "$env('NETBOX_URL') & \"/api/ipam/ip-addresses/\"",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\t    \"address\": msg.vmipaddress & \"/32\",\t    \"assigned_object_type\": \"virtualization.vminterface\",\t    \"assigned_object_id\": msg.payload.id\t}",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "method",
+                "pt": "msg",
+                "to": "POST",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "headers.content-type",
+                "pt": "msg",
+                "to": "application/json",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 450,
+        "y": 360,
+        "wires": [
+            [
+                "130e7716707c4b4c"
+            ]
+        ]
+    },
+    {
+        "id": "130e7716707c4b4c",
+        "type": "http request",
+        "z": "0f9d09fb97baf1f4",
+        "name": "",
+        "method": "use",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 650,
+        "y": 360,
+        "wires": [
+            [
+                "9b82cfcf00c38297"
+            ]
+        ]
+    },
+    {
+        "id": "9b82cfcf00c38297",
+        "type": "change",
+        "z": "0f9d09fb97baf1f4",
+        "name": "Set Primary IP",
+        "rules": [
+            {
+                "t": "set",
+                "p": "headers",
+                "pt": "msg",
+                "to": "{}",
+                "tot": "json"
+            },
+            {
+                "t": "set",
+                "p": "headers.Authorization",
+                "pt": "msg",
+                "to": "\"Token \" & $env('NETBOX_TOKEN')",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "url",
+                "pt": "msg",
+                "to": "$env('NETBOX_URL') & \"/api/virtualization/virtual-machines/\" & msg.vmid & \"/\"",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\t    \"primary_ip4\": {\t        \"address\": msg.vmipaddress & \"/32\"\t    },\t    \"status\": \"active\"\t}",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "method",
+                "pt": "msg",
+                "to": "PATCH",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "headers.content-type",
+                "pt": "msg",
+                "to": "application/json",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 840,
+        "y": 360,
+        "wires": [
+            [
+                "78012ffff632c74a"
+            ]
+        ]
+    },
+    {
+        "id": "78012ffff632c74a",
+        "type": "http request",
+        "z": "0f9d09fb97baf1f4",
+        "name": "",
+        "method": "use",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1030,
+        "y": 360,
+        "wires": [
+            []
         ]
     }
 ]
