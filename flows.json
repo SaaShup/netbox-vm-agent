@@ -371,7 +371,7 @@
         "links": [
             "3629f4e628f876ec"
         ],
-        "x": 1195,
+        "x": 1215,
         "y": 100,
         "wires": []
     },
@@ -990,7 +990,7 @@
         "links": [
             "2e3451e108a30101"
         ],
-        "x": 865,
+        "x": 935,
         "y": 460,
         "wires": []
     },
@@ -1049,8 +1049,8 @@
                 "t": "set",
                 "p": "vmipaddress",
                 "pt": "msg",
-                "to": "payload.server.addresses.Ext-Net.0.addr",
-                "tot": "msg"
+                "to": "msg.payload.server.addresses.\"Ext-Net\"[0].version = 4 ? msg.payload.server.addresses.\"Ext-Net\"[0].addr  : msg.payload.server.addresses.\"Ext-Net\"[1].addr",
+                "tot": "jsonata"
             }
         ],
         "action": "",
