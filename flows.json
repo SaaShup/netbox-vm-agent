@@ -1,5 +1,62 @@
 [
     {
+        "id": "14e208e9bb5420e1",
+        "type": "tab",
+        "label": "ENTRYPOINT",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "f498656cd7178fd2",
+        "type": "tab",
+        "label": "OPENSTACK",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "0f9d09fb97baf1f4",
+        "type": "tab",
+        "label": "NETBOX",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "269f4dbfe5402677",
+        "type": "subflow",
+        "name": "Openstack Auth",
+        "info": "",
+        "category": "",
+        "in": [
+            {
+                "x": 280,
+                "y": 140,
+                "wires": [
+                    {
+                        "id": "de5bd1cbb3e4fc62"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 880,
+                "y": 140,
+                "wires": [
+                    {
+                        "id": "e9e7b399742eb8ca",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [],
+        "meta": {},
+        "color": "#DDAA99"
+    },
+    {
         "id": "f26f92b9561d3735",
         "type": "subflow",
         "name": "valide json schema",
@@ -45,6 +102,83 @@
         "env": [],
         "meta": {},
         "color": "#DDAA99"
+    },
+    {
+        "id": "de5bd1cbb3e4fc62",
+        "type": "change",
+        "z": "269f4dbfe5402677",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "template",
+                "pt": "msg",
+                "to": "OVHtemplate",
+                "tot": "global"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\t   \"auth\": {\t       \"identity\": {\t           \"methods\": [ \"password\" ],\t           \"password\": {\t               \"user\": {\t                   \"name\": msg.createvm.provider.username,\t                   \"domain\": {\t                       \"id\": \"default\"                    \t                   },\t                   \"password\": msg.createvm.provider.password               \t               }            \t           }        \t       },\t       \"scope\": {\t           \"project\": {\t               \"name\": msg.createvm.provider.project,\t               \"domain\": {\t                   \"id\": \"default\"                \t               }            \t           }        \t       }    \t   }\t}",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "url",
+                "pt": "msg",
+                "to": "\"https://auth.\" & msg.createvm.provider.url & \"/v3/auth/tokens?nocatalog\"",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "method",
+                "pt": "msg",
+                "to": "POST",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "endpoints",
+                "pt": "global",
+                "to": "{}",
+                "tot": "json"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 440,
+        "y": 140,
+        "wires": [
+            [
+                "e9e7b399742eb8ca"
+            ]
+        ]
+    },
+    {
+        "id": "e9e7b399742eb8ca",
+        "type": "http request",
+        "z": "269f4dbfe5402677",
+        "name": "Auth OPENSTACK",
+        "method": "use",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 690,
+        "y": 140,
+        "wires": [
+            []
+        ]
     },
     {
         "id": "2d0de34508e101ba",
@@ -186,14 +320,6 @@
         "wires": [
             []
         ]
-    },
-    {
-        "id": "14e208e9bb5420e1",
-        "type": "tab",
-        "label": "ENTRYPOINT",
-        "disabled": false,
-        "info": "",
-        "env": []
     },
     {
         "id": "18db3dc4cf3c44c8",
@@ -380,6 +506,915 @@
         "wires": [
             [
                 "d3b57f12cf115b2e"
+            ]
+        ]
+    },
+    {
+        "id": "c1e5d655037acf4d",
+        "type": "switch",
+        "z": "f498656cd7178fd2",
+        "name": "",
+        "property": "statusCode",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "gt",
+                "v": "300",
+                "vt": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 470,
+        "y": 240,
+        "wires": [
+            [
+                "44652a36518303bf"
+            ],
+            [
+                "bbf0a2f68fa4555b"
+            ]
+        ]
+    },
+    {
+        "id": "3629f4e628f876ec",
+        "type": "link in",
+        "z": "f498656cd7178fd2",
+        "name": "Openstack Create VM",
+        "links": [
+            "7eaa2c1d4ab22015"
+        ],
+        "x": 95,
+        "y": 240,
+        "wires": [
+            [
+                "b4137feb09cdcef8"
+            ]
+        ]
+    },
+    {
+        "id": "bbf0a2f68fa4555b",
+        "type": "change",
+        "z": "f498656cd7178fd2",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "bearer",
+                "pt": "msg",
+                "to": "headers[\"x-subject-token\"]",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "headers",
+                "pt": "msg",
+                "to": "{}",
+                "tot": "json"
+            },
+            {
+                "t": "set",
+                "p": "headers[\"X-Auth-Token\"]",
+                "pt": "msg",
+                "to": "bearer",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "url",
+                "pt": "msg",
+                "to": "\"https://compute.\" & msg.createvm.region & \".\" & msg.createvm.provider.url & \"/v2.1/\" & msg.createvm.provider.projectId & \"/servers\"",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "method",
+                "pt": "msg",
+                "to": "POST",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "requestTimeout",
+                "pt": "msg",
+                "to": "15000",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\t   \"server\":{\t       \"flavorRef\": msg.createvm.flavor,\t       \"name\": msg.createvm.name,\t       \"imageRef\": msg.createvm.image,\t       \"networks\":[\t           {\t               \"uuid\": msg.createvm.network\t           }\t       ],\t       \"metadata\": {\t            \"ovh-monthly-instance\": msg.createvm.paymentPeriod = \"monthly\" ? \"1\" : \"0\"\t       },\t       \"key_name\": msg.createvm.keyPair,\t       \"user_data\": msg.createvm.userData\t   }\t}",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 700,
+        "y": 260,
+        "wires": [
+            [
+                "91868f37fe29da87"
+            ]
+        ]
+    },
+    {
+        "id": "91868f37fe29da87",
+        "type": "http request",
+        "z": "f498656cd7178fd2",
+        "name": "Create OPENSTACK",
+        "method": "use",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 920,
+        "y": 260,
+        "wires": [
+            [
+                "cac3c2207ec1f1d9",
+                "39d57fde5f738cb9"
+            ]
+        ]
+    },
+    {
+        "id": "b4137feb09cdcef8",
+        "type": "subflow:269f4dbfe5402677",
+        "z": "f498656cd7178fd2",
+        "name": "",
+        "x": 260,
+        "y": 240,
+        "wires": [
+            [
+                "c1e5d655037acf4d"
+            ]
+        ]
+    },
+    {
+        "id": "cac3c2207ec1f1d9",
+        "type": "http response",
+        "z": "f498656cd7178fd2",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1190,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "44652a36518303bf",
+        "type": "change",
+        "z": "f498656cd7178fd2",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\t    \"status\": 401,\t    \"error\": \"Unauthorized\",\t    \"message\": \"Error while authenticating against \" & msg.createvm.provider.name\t\t}",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "statusCode",
+                "pt": "msg",
+                "to": "401",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 740,
+        "y": 180,
+        "wires": [
+            [
+                "f76d048873323b7e"
+            ]
+        ]
+    },
+    {
+        "id": "f76d048873323b7e",
+        "type": "http response",
+        "z": "f498656cd7178fd2",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 970,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "d2fe6bfa6a8cae77",
+        "type": "link in",
+        "z": "f498656cd7178fd2",
+        "name": "Check Update server status",
+        "links": [
+            "bdc41e0727eed85d"
+        ],
+        "x": 55,
+        "y": 520,
+        "wires": [
+            [
+                "25ebb1629c93662b"
+            ]
+        ]
+    },
+    {
+        "id": "bdc41e0727eed85d",
+        "type": "link out",
+        "z": "f498656cd7178fd2",
+        "name": "link out 1",
+        "mode": "link",
+        "links": [
+            "d2fe6bfa6a8cae77"
+        ],
+        "x": 1275,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "25ebb1629c93662b",
+        "type": "change",
+        "z": "f498656cd7178fd2",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "serverstatus",
+                "pt": "msg",
+                "to": "uknown",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 200,
+        "y": 520,
+        "wires": [
+            [
+                "1b7de3c494c34f41"
+            ]
+        ]
+    },
+    {
+        "id": "8e52092d7337f432",
+        "type": "switch",
+        "z": "f498656cd7178fd2",
+        "name": "",
+        "property": "serverstatus",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "ACTIVE",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 550,
+        "y": 520,
+        "wires": [
+            [
+                "e4159275aef7dd1b"
+            ],
+            [
+                "ccbb7bd32d250d8e"
+            ]
+        ]
+    },
+    {
+        "id": "e058ee70a796e859",
+        "type": "subflow:269f4dbfe5402677",
+        "z": "f498656cd7178fd2",
+        "name": "",
+        "x": 400,
+        "y": 640,
+        "wires": [
+            [
+                "ad1fff9801d08484"
+            ]
+        ]
+    },
+    {
+        "id": "ad1fff9801d08484",
+        "type": "change",
+        "z": "f498656cd7178fd2",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "bearer",
+                "pt": "msg",
+                "to": "headers[\"x-subject-token\"]",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "headers",
+                "pt": "msg",
+                "to": "{}",
+                "tot": "json"
+            },
+            {
+                "t": "set",
+                "p": "headers[\"X-Auth-Token\"]",
+                "pt": "msg",
+                "to": "bearer",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "requestTimeout",
+                "pt": "msg",
+                "to": "15000",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "method",
+                "pt": "msg",
+                "to": "GET",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "url",
+                "pt": "msg",
+                "to": "\"https://compute.\" & msg.createvm.region & \".\" & msg.createvm.provider.url & \"/v2.1/\" & msg.createvm.provider.projectId & \"/servers/\" & msg.serverId",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 580,
+        "y": 640,
+        "wires": [
+            [
+                "1825c2e333ffa921"
+            ]
+        ]
+    },
+    {
+        "id": "9b335838e4bbae58",
+        "type": "change",
+        "z": "f498656cd7178fd2",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "serverstatus",
+                "pt": "msg",
+                "to": "payload.server.status",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1200,
+        "y": 640,
+        "wires": [
+            [
+                "8e52092d7337f432"
+            ]
+        ]
+    },
+    {
+        "id": "ccbb7bd32d250d8e",
+        "type": "delay",
+        "z": "f498656cd7178fd2",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "90",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 220,
+        "y": 640,
+        "wires": [
+            [
+                "e058ee70a796e859"
+            ]
+        ]
+    },
+    {
+        "id": "1825c2e333ffa921",
+        "type": "http request",
+        "z": "f498656cd7178fd2",
+        "name": "Get openstack status",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 800,
+        "y": 640,
+        "wires": [
+            [
+                "6684af60556eba6d"
+            ]
+        ]
+    },
+    {
+        "id": "1b7de3c494c34f41",
+        "type": "change",
+        "z": "f498656cd7178fd2",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "serverId",
+                "pt": "msg",
+                "to": "payload.server.id",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 400,
+        "y": 520,
+        "wires": [
+            [
+                "8e52092d7337f432"
+            ]
+        ]
+    },
+    {
+        "id": "6684af60556eba6d",
+        "type": "json",
+        "z": "f498656cd7178fd2",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 990,
+        "y": 640,
+        "wires": [
+            [
+                "9b335838e4bbae58"
+            ]
+        ]
+    },
+    {
+        "id": "e4159275aef7dd1b",
+        "type": "link out",
+        "z": "f498656cd7178fd2",
+        "name": "link out 2",
+        "mode": "link",
+        "links": [
+            "2e3451e108a30101"
+        ],
+        "x": 935,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "39d57fde5f738cb9",
+        "type": "switch",
+        "z": "f498656cd7178fd2",
+        "name": "",
+        "property": "payload.server",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "nempty"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 1130,
+        "y": 300,
+        "wires": [
+            [
+                "bdc41e0727eed85d"
+            ]
+        ]
+    },
+    {
+        "id": "2e3451e108a30101",
+        "type": "link in",
+        "z": "0f9d09fb97baf1f4",
+        "name": "Netbox Vm Update",
+        "links": [
+            "d5a303be485f823f",
+            "e4159275aef7dd1b"
+        ],
+        "x": 125,
+        "y": 240,
+        "wires": [
+            [
+                "664ba98f5286c753"
+            ]
+        ]
+    },
+    {
+        "id": "1b9a3a26756111fd",
+        "type": "change",
+        "z": "0f9d09fb97baf1f4",
+        "name": "Set VM Data to fetch",
+        "rules": [
+            {
+                "t": "set",
+                "p": "headers",
+                "pt": "msg",
+                "to": "{}",
+                "tot": "json"
+            },
+            {
+                "t": "set",
+                "p": "url",
+                "pt": "msg",
+                "to": "$env('NETBOX_URL') & \"/api/virtualization/virtual-machines/?name=\" & msg.createvm.name",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "headers.Authorization",
+                "pt": "msg",
+                "to": "\"Token \" & $env('NETBOX_TOKEN')",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "headers.content-type",
+                "pt": "msg",
+                "to": "application/json",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "vmipaddress",
+                "pt": "msg",
+                "to": "msg.payload.server.addresses.\"Ext-Net\"[0].version = 4 ? msg.payload.server.addresses.\"Ext-Net\"[0].addr  : msg.payload.server.addresses.\"Ext-Net\"[1].addr",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 560,
+        "y": 240,
+        "wires": [
+            [
+                "2d54e993660590aa"
+            ]
+        ]
+    },
+    {
+        "id": "2d54e993660590aa",
+        "type": "http request",
+        "z": "0f9d09fb97baf1f4",
+        "name": "Fetch VM ID",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 750,
+        "y": 240,
+        "wires": [
+            [
+                "a3d6201e4731b9c2"
+            ]
+        ]
+    },
+    {
+        "id": "a3d6201e4731b9c2",
+        "type": "change",
+        "z": "0f9d09fb97baf1f4",
+        "name": "Create VM interface",
+        "rules": [
+            {
+                "t": "set",
+                "p": "vmid",
+                "pt": "msg",
+                "to": "payload.results[0].id",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "headers",
+                "pt": "msg",
+                "to": "{}",
+                "tot": "json"
+            },
+            {
+                "t": "set",
+                "p": "headers.Authorization",
+                "pt": "msg",
+                "to": "\"Token \" & $env('NETBOX_TOKEN')",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "url",
+                "pt": "msg",
+                "to": "$env('NETBOX_URL') & \"/api/virtualization/interfaces/\"",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\t    \"name\": \"eth0\",\t    \"virtual_machine\": {\t        \"name\": msg.createvm.name\t    }\t\t}",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "method",
+                "pt": "msg",
+                "to": "POST",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "headers.content-type",
+                "pt": "msg",
+                "to": "application/json",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 940,
+        "y": 240,
+        "wires": [
+            [
+                "4ab758accbb6cbc1"
+            ]
+        ]
+    },
+    {
+        "id": "4ab758accbb6cbc1",
+        "type": "http request",
+        "z": "0f9d09fb97baf1f4",
+        "name": "",
+        "method": "use",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1190,
+        "y": 240,
+        "wires": [
+            [
+                "f105cc2b838df549"
+            ]
+        ]
+    },
+    {
+        "id": "f105cc2b838df549",
+        "type": "change",
+        "z": "0f9d09fb97baf1f4",
+        "name": "Create IP Address",
+        "rules": [
+            {
+                "t": "set",
+                "p": "headers",
+                "pt": "msg",
+                "to": "{}",
+                "tot": "json"
+            },
+            {
+                "t": "set",
+                "p": "headers.Authorization",
+                "pt": "msg",
+                "to": "\"Token \" & $env('NETBOX_TOKEN')",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "url",
+                "pt": "msg",
+                "to": "$env('NETBOX_URL') & \"/api/ipam/ip-addresses/\"",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\t    \"address\": msg.vmipaddress & \"/32\",\t    \"assigned_object_type\": \"virtualization.vminterface\",\t    \"assigned_object_id\": msg.payload.id\t}",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "method",
+                "pt": "msg",
+                "to": "POST",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "headers.content-type",
+                "pt": "msg",
+                "to": "application/json",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 450,
+        "y": 360,
+        "wires": [
+            [
+                "130e7716707c4b4c"
+            ]
+        ]
+    },
+    {
+        "id": "130e7716707c4b4c",
+        "type": "http request",
+        "z": "0f9d09fb97baf1f4",
+        "name": "",
+        "method": "use",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 650,
+        "y": 360,
+        "wires": [
+            [
+                "9b82cfcf00c38297"
+            ]
+        ]
+    },
+    {
+        "id": "9b82cfcf00c38297",
+        "type": "change",
+        "z": "0f9d09fb97baf1f4",
+        "name": "Set Primary IP",
+        "rules": [
+            {
+                "t": "set",
+                "p": "headers",
+                "pt": "msg",
+                "to": "{}",
+                "tot": "json"
+            },
+            {
+                "t": "set",
+                "p": "headers.Authorization",
+                "pt": "msg",
+                "to": "\"Token \" & $env('NETBOX_TOKEN')",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "url",
+                "pt": "msg",
+                "to": "$env('NETBOX_URL') & \"/api/virtualization/virtual-machines/\" & msg.vmid & \"/\"",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\t    \"primary_ip4\": {\t        \"address\": msg.vmipaddress & \"/32\"\t    },\t    \"status\": \"active\"\t}",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "method",
+                "pt": "msg",
+                "to": "PATCH",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "headers.content-type",
+                "pt": "msg",
+                "to": "application/json",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 840,
+        "y": 360,
+        "wires": [
+            [
+                "78012ffff632c74a"
+            ]
+        ]
+    },
+    {
+        "id": "78012ffff632c74a",
+        "type": "http request",
+        "z": "0f9d09fb97baf1f4",
+        "name": "",
+        "method": "use",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1030,
+        "y": 360,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "664ba98f5286c753",
+        "type": "switch",
+        "z": "0f9d09fb97baf1f4",
+        "name": "Run Netbox only if variable is set",
+        "property": "NETBOX_URL",
+        "propertyType": "env",
+        "rules": [
+            {
+                "t": "nempty"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 300,
+        "y": 240,
+        "wires": [
+            [
+                "1b9a3a26756111fd"
             ]
         ]
     }
