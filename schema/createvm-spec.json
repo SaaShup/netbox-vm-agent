@@ -46,6 +46,13 @@
         "keyPair": {
             "type": "string"
         },
+        "paymentPeriod": {
+            "type": "string"
+            "enum": [
+                "hourly",
+                "monthly"
+            ]
+        },
         "userData": {
             "type": "string"
         }
@@ -56,7 +63,8 @@
         "name",
         "image",
         "network",
-        "keyPair"
+        "keyPair",
+        "paymentPeriod"
     ]
 }
 
